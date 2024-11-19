@@ -34,8 +34,18 @@ public class MainTest {
 
 
     @Test
-    public void testGetMedian() throws IOException {
-        InputStream inputStream = new BufferedInputStream(Files.newInputStream(Paths.get("src/test/java/com/fanruan/p5/bin1.in")));
+    public void test1() throws Exception {
+        testActually("src/test/java/com/fanruan/p5/bin1.in", "src/test/java/com/fanruan/p5/bin1.out");
+    }
+
+    @Test
+    public void test2() throws Exception {
+        testActually("src/test/java/com/fanruan/p5/bin2.in", "src/test/java/com/fanruan/p5/bin2.out");
+    }
+
+
+    private void testActually(String inPath, String outPath) throws Exception {
+        InputStream inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(inPath)));
         ByteArrayInputStream bais = new ByteArrayInputStream(readBytes(inputStream));
         InputStream originalSystemIn = System.in;
         System.setIn(bais);
@@ -45,7 +55,7 @@ public class MainTest {
         System.setIn(originalSystemIn);
         String actualOutput = outContent.toString();
         String expectedOutput;
-        try (InputStream expectedInputStream = new BufferedInputStream(Files.newInputStream(Paths.get("src/test/java/com/fanruan/p5/bin1.out")));
+        try (InputStream expectedInputStream = new BufferedInputStream(Files.newInputStream(Paths.get(outPath)));
              BufferedReader reader = new BufferedReader(new InputStreamReader(expectedInputStream))) {
             expectedOutput = reader.readLine();
         }
