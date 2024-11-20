@@ -3,7 +3,8 @@ package com.fanruan.p9;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.StringTokenizer;
 
 /**
@@ -46,21 +47,20 @@ public class Main {
         tokens = new StringTokenizer(line);
         int V = Integer.parseInt(tokens.nextToken());
         int E = Integer.parseInt(tokens.nextToken());
-        Edge[] edges = new Edge[E];
+        ArrayList<Edge> edges = new ArrayList<>();
 
         for (int e = 0; e < E; ++e) {
             line = reader.readLine();
             tokens = new StringTokenizer(line);
-            int src = Integer.parseInt(tokens.nextToken()) - 1; // 适应从 0 开始的索引
-            int dest = Integer.parseInt(tokens.nextToken()) - 1; // 适应从 0 开始的索引
+            int src = Integer.parseInt(tokens.nextToken()) - 1;
+            int dest = Integer.parseInt(tokens.nextToken()) - 1;
             int weight = Integer.parseInt(tokens.nextToken());
-            edges[e] = new Edge(src, dest, weight);
+            edges.add(new Edge(src, dest, weight));
         }
 
-        System.out.println(kruskalMST(edges, V, E));
+        System.out.println(kruskalMST(edges, V));
     }
 
-    // 使用路径压缩和按秩合并的并查集查找
     static int find(Subset[] subsets, int i) {
         if (subsets[i].parent != i) {
             subsets[i].parent = find(subsets, subsets[i].parent);
@@ -68,7 +68,6 @@ public class Main {
         return subsets[i].parent;
     }
 
-    // 按秩合并
     static void union(Subset[] subsets, int x, int y) {
         int xroot = find(subsets, x);
         int yroot = find(subsets, y);
@@ -83,33 +82,26 @@ public class Main {
         }
     }
 
-    // Kruskal 最小生成树算法
-    static long kruskalMST(Edge[] edges, int V, int E) {
-        // 首先对所有边按权重进行排序
-        Arrays.sort(edges);
+    static long kruskalMST(ArrayList<Edge> edges, int V) {
+        Collections.sort(edges);
 
-        // 创建 V 个子集，初始时每个点都是自己的父节点
         Subset[] subsets = new Subset[V];
         for (int v = 0; v < V; ++v) {
             subsets[v] = new Subset(v);
         }
 
-        long minimumCost = 0; // 最终的最小生成树的总权重
-        int edgesUsed = 0;    // 已经加入生成树的边数
+        long minimumCost = 0;
+        int edgesUsed = 0;
 
-        // 处理每一条边
-        for (int i = 0; i < E && edgesUsed < V - 1; ++i) {
-            Edge edge = edges[i];
-
-            // 查找当前边的两个端点是否属于不同的集合
+        for (Edge edge : edges) {
             int x = find(subsets, edge.src);
             int y = find(subsets, edge.dest);
 
-            // 如果端点不属于一个集合，则将该边加入最小生成树
             if (x != y) {
                 union(subsets, x, y);
                 minimumCost += edge.weight;
                 edgesUsed++;
+                if (edgesUsed == V - 1) break;
             }
         }
 
