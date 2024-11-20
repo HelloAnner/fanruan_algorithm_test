@@ -3,6 +3,7 @@ package com.fanruan.p6;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -14,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,7 +42,7 @@ public class MainTest {
 
 
     @Test
-//    @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
+    @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test1() throws Exception {
         testActually("src/test/java/com/fanruan/p6/1.in", "src/test/java/com/fanruan/p6/1.out");
     }
