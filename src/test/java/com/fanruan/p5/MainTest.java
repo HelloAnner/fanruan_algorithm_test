@@ -1,9 +1,10 @@
 package com.fanruan.p5;
 
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -15,30 +16,36 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class MainTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
-    @Before
+    private final static long LIMIT = 100;
+
+    @BeforeEach
     public void setUpStreams() {
         System.setOut(new PrintStream(outContent));
     }
 
-    @After
+    @AfterEach
     public void restoreStreams() {
         System.setOut(System.out);
     }
 
 
     @Test
+    @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test1() throws Exception {
         testActually("src/test/java/com/fanruan/p5/bin1.in", "src/test/java/com/fanruan/p5/bin1.out");
     }
 
     @Test
+    @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test2() throws Exception {
         testActually("src/test/java/com/fanruan/p5/bin2.in", "src/test/java/com/fanruan/p5/bin2.out");
     }

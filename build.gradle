@@ -11,5 +11,11 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'lib', include: ['**/*.jar'])
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    maxParallelForks = 3
+    useJUnitPlatform()
 }
