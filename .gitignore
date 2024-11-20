@@ -5,7 +5,3 @@
 build
 
 .idea/
-
-**/*.in
-
-**/*.out
