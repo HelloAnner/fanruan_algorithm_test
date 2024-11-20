@@ -44,13 +44,13 @@ public class MainTest {
     }
 
     @Test
-    @Timeout(value = LIMIT,unit = TimeUnit.MILLISECONDS)
+    @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test1() throws Exception {
         testActually("src/test/java/com/fanruan/p16/1.in", "src/test/java/com/fanruan/p16/1.out");
     }
 
     @Test
-    @Timeout(value = LIMIT,unit = TimeUnit.MILLISECONDS)
+    @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test2() throws Exception {
         testActually("src/test/java/com/fanruan/p16/2.in", "src/test/java/com/fanruan/p16/2.out");
     }
@@ -76,9 +76,15 @@ public class MainTest {
         System.setIn(originalSystemIn);
         String actualOutput = outContent.toString();
         String expectedOutput;
-        try (InputStream expectedInputStream = new BufferedInputStream(Files.newInputStream(Paths.get(outPath)));
+        try (BufferedInputStream expectedInputStream = new BufferedInputStream(Files.newInputStream(Paths.get(outPath)));
              BufferedReader reader = new BufferedReader(new InputStreamReader(expectedInputStream))) {
-            expectedOutput = reader.readLine();
+
+            StringBuilder outputBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                outputBuilder.append(line).append("\n"); // 追加每一行并添加换行符
+            }
+            expectedOutput = outputBuilder.toString().trim();
         }
 
         assertEquals(expectedOutput, actualOutput.trim());

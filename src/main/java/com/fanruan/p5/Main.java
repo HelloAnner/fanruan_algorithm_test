@@ -16,11 +16,8 @@ public class Main {
             }
         } catch (Exception ignore) {
         }
-
-
         System.out.println(getMedian(array));
     }
-
 
     public static int getMedian(int[] array) {
         int[] count = new int[100001];
