@@ -8,11 +8,13 @@ import java.util.Collections;
 import java.util.StringTokenizer;
 
 /**
+ * <a href="https://judge.fineres.com/problem/9">#9. 最小生成树</a>
+ * <p>
+ * issue: timeout
+ *
  * @author Anner
  * @since 11.0
  * Created on 2024/11/21
- *
- * <a href="https://judge.fineres.com/problem/9">#9. 最小生成树</a>
  */
 public class Main {
     static class Edge implements Comparable<Edge> {
