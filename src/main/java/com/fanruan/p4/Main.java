@@ -6,6 +6,7 @@ import java.util.Scanner;
  * 给你一个数组，输出里面出现超过1/2的元素。保证有且只有一个解。
  * 第一行是一个整数n(n <=1e7)，表示测试数据的个数 ，之后每一行都是一个整数。
  * 输出出现超过1/2的那个数字。
+ *
  * <a href="https://judge.fineres.com/practice/classify/25/problem/4">#4. 数组中出现最多的元素</a>
  *
  * @author Anner

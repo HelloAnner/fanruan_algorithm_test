@@ -19,6 +19,12 @@ public class Main {
         System.out.println(getMedian(array));
     }
 
+    /**
+     * 计数排序
+     *
+     * @param array target
+     * @return ans
+     */
     public static int getMedian(int[] array) {
         int[] count = new int[100001];
 
