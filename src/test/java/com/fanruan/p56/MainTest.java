@@ -1,4 +1,4 @@
-package com.fanruan.p9;
+package com.fanruan.p56;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,12 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Anner
  * @since 11.0
- * Created on 2024/11/21
+ * Created on 2024/11/25
  */
 public class MainTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
-    private final static long LIMIT = 500;
+    private final static long LIMIT = 100;
 
     @BeforeEach
     public void setUpStreams() {
@@ -43,62 +43,61 @@ public class MainTest {
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test1() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst1.in", "src/test/java/com/fanruan/p9/mst1.ans");
+        testActually("src/test/java/com/fanruan/p56/number1.in", "src/test/java/com/fanruan/p56/number1.out");
     }
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test2() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst2.in", "src/test/java/com/fanruan/p9/mst2.ans");
+        testActually("src/test/java/com/fanruan/p56/number2.in", "src/test/java/com/fanruan/p56/number2.out");
     }
-
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test3() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst3.in", "src/test/java/com/fanruan/p9/mst3.ans");
+        testActually("src/test/java/com/fanruan/p56/number3.in", "src/test/java/com/fanruan/p56/number3.out");
     }
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test4() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst4.in", "src/test/java/com/fanruan/p9/mst4.ans");
+        testActually("src/test/java/com/fanruan/p56/number4.in", "src/test/java/com/fanruan/p56/number4.out");
     }
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test5() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst5.in", "src/test/java/com/fanruan/p9/mst5.ans");
+        testActually("src/test/java/com/fanruan/p56/number5.in", "src/test/java/com/fanruan/p56/number5.out");
     }
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test6() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst6.in", "src/test/java/com/fanruan/p9/mst6.ans");
+        testActually("src/test/java/com/fanruan/p56/number6.in", "src/test/java/com/fanruan/p56/number6.out");
     }
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test7() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst7.in", "src/test/java/com/fanruan/p9/mst7.ans");
+        testActually("src/test/java/com/fanruan/p56/number7.in", "src/test/java/com/fanruan/p56/number7.out");
     }
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test8() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst8.in", "src/test/java/com/fanruan/p9/mst8.ans");
+        testActually("src/test/java/com/fanruan/p56/number8.in", "src/test/java/com/fanruan/p56/number8.out");
     }
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test9() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst9.in", "src/test/java/com/fanruan/p9/mst9.ans");
+        testActually("src/test/java/com/fanruan/p56/number9.in", "src/test/java/com/fanruan/p56/number9.out");
     }
 
     @Test
     @Timeout(value = LIMIT, unit = TimeUnit.MILLISECONDS)
     public void test10() throws Exception {
-        testActually("src/test/java/com/fanruan/p9/mst10.in", "src/test/java/com/fanruan/p9/mst10.ans");
+        testActually("src/test/java/com/fanruan/p56/number10.in", "src/test/java/com/fanruan/p56/number10.out");
     }
 
 
@@ -119,7 +118,7 @@ public class MainTest {
             StringBuilder outputBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                outputBuilder.append(line).append("\n");
+                outputBuilder.append(line).append("\n"); // 追加每一行并添加换行符
             }
             expectedOutput = outputBuilder.toString().trim();
         }
