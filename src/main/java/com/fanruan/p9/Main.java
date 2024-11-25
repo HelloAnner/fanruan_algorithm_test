@@ -4,13 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.StringTokenizer;
 
 /**
  * <a href="https://judge.fineres.com/problem/9">#9. 最小生成树</a>
  * <p>
- * issue: timeout
+ * 需要使用快排代替自带的 sort 才可以通过
  *
  * @author Anner
  * @since 11.0
@@ -43,24 +41,36 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer tokens;
 
         String line = reader.readLine();
-        tokens = new StringTokenizer(line);
-        int V = Integer.parseInt(tokens.nextToken());
-        int E = Integer.parseInt(tokens.nextToken());
+        int V = readInt(line, 0);
+        int E = readInt(line, 1);
         ArrayList<Edge> edges = new ArrayList<>();
 
         for (int e = 0; e < E; ++e) {
             line = reader.readLine();
-            tokens = new StringTokenizer(line);
-            int src = Integer.parseInt(tokens.nextToken()) - 1;
-            int dest = Integer.parseInt(tokens.nextToken()) - 1;
-            int weight = Integer.parseInt(tokens.nextToken());
+            int src = readInt(line, 0) - 1;
+            int dest = readInt(line, 1) - 1;
+            int weight = readInt(line, 2);
             edges.add(new Edge(src, dest, weight));
         }
 
         System.out.println(kruskalMST(edges, V));
+    }
+
+    static int readInt(String line, int index) {
+        int start = 0;
+        while (index > 0) {
+            if (line.charAt(start) == ' ') {
+                index--;
+            }
+            start++;
+        }
+        int end = start;
+        while (end < line.length() && line.charAt(end) != ' ') {
+            end++;
+        }
+        return Integer.parseInt(line.substring(start, end));
     }
 
     static int find(Subset[] subsets, int i) {
@@ -84,8 +94,33 @@ public class Main {
         }
     }
 
+    static void quickSort(ArrayList<Edge> edges, int low, int high) {
+        if (low < high) {
+            int pi = partition(edges, low, high);
+            quickSort(edges, low, pi - 1);
+            quickSort(edges, pi + 1, high);
+        }
+    }
+
+    static int partition(ArrayList<Edge> edges, int low, int high) {
+        Edge pivot = edges.get(high);
+        int i = (low - 1);
+        for (int j = low; j < high; j++) {
+            if (edges.get(j).weight < pivot.weight) {
+                i++;
+                Edge temp = edges.get(i);
+                edges.set(i, edges.get(j));
+                edges.set(j, temp);
+            }
+        }
+        Edge temp = edges.get(i + 1);
+        edges.set(i + 1, edges.get(high));
+        edges.set(high, temp);
+        return i + 1;
+    }
+
     static long kruskalMST(ArrayList<Edge> edges, int V) {
-        Collections.sort(edges);
+        quickSort(edges, 0, edges.size() - 1);
 
         Subset[] subsets = new Subset[V];
         for (int v = 0; v < V; ++v) {

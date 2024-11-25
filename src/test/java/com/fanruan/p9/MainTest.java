@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MainTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
-    private final static long LIMIT = 200;
+    private final static long LIMIT = 100;
 
     @BeforeEach
     public void setUpStreams() {
