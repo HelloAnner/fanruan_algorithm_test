@@ -2,7 +2,10 @@ package com.fanruan.p22;
 
 import java.io.BufferedInputStream;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,7 +14,7 @@ import java.util.Map;
  *
  * <a href="https://judge.fineres.com/problem/22">#22. 求中位数【二】</a>
  * <p>
- * issue: wrong answer
+ * issue: timeout
  *
  * @author Anner
  * @since 11.0
@@ -19,53 +22,54 @@ import java.util.Map;
  */
 public class Main {
     public static void main(String[] args) {
-        // 二进制输入，无所谓超出范围，可以解析为任何长度的数字，以题意为准
+        int[] array = readIntArray();
+        Map<Integer, Integer> frequencyMap = new HashMap<>();
+
+        // 统计频率
+        for (int num : array) {
+            frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
+        }
+
+        // 排序不同的数
+        List<Integer> uniqueNumbers = new ArrayList<>(frequencyMap.keySet());
+        Collections.sort(uniqueNumbers);
+
+        int n = array.length;
+        int pos1 = n / 2;       // 第5,000,000个数的位置
+        int pos2 = pos1 + 1;    // 第5,000,001个数的位置
+
+        int count = 0;
+        int median1 = 0;        // 第5,000,000个数
+        int median2 = 0;        // 第5,000,001个数
+
+        // 遍历排序后的不同数，找到中位数位置
+        for (int num : uniqueNumbers) {
+            int freq = frequencyMap.get(num);
+            if (count + freq >= pos1 && median1 == 0) {
+                median1 = num;
+            }
+            if (count + freq >= pos2 && median2 == 0) {
+                median2 = num;
+                break;
+            }
+            count += freq;
+        }
+
+        // 计算中位数并向下取整
+        int median = (median1 + median2) / 2;
+        System.out.println(median);
+    }
+
+    // 读取二进制文件中的整数数组
+    private static int[] readIntArray() {
         int[] array = new int[10000000];
         try (ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(System.in))) {
             for (int i = 0; i < 10000000; i++) {
                 array[i] = in.readInt();
             }
         } catch (Exception ignore) {
+            // 忽略异常
         }
-        System.out.println(getMedian(array));
-    }
-
-    /**
-     * 计数排序
-     *
-     * @param array target
-     * @return ans
-     */
-    public static int getMedian(int[] array) {
-        Map<Integer, Integer> countMap = new HashMap<>();
-
-        for (int num : array) {
-            countMap.put(num, countMap.getOrDefault(num, 0) + 1);
-        }
-
-        int totalNumbers = array.length;
-        int medianPos1 = totalNumbers / 2;
-        int medianPos2 = (totalNumbers % 2 == 0) ? medianPos1 + 1 : medianPos1;
-
-        int cumulativeCount = 0;
-        Integer median1 = null;
-        Integer median2 = null;
-
-        for (Map.Entry<Integer, Integer> entry : countMap.entrySet()) {
-            cumulativeCount += entry.getValue();
-            if (cumulativeCount >= medianPos1 && median1 == null) {
-                median1 = entry.getKey();
-            }
-            if (cumulativeCount >= medianPos2) {
-                median2 = entry.getKey();
-                break;
-            }
-        }
-
-        if (totalNumbers % 2 == 0) {
-            return (median1 + median2) / 2;
-        } else {
-            return median1;
-        }
+        return array;
     }
 }

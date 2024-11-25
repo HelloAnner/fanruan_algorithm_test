@@ -28,7 +28,7 @@ public class MainTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
-    private final static long LIMIT = 5000;
+    private final static long LIMIT = 500;
 
     @BeforeEach
     public void setUpStreams() {
