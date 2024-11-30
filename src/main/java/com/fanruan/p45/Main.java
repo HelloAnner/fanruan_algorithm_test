@@ -1,5 +1,6 @@
 package com.fanruan.p45;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
@@ -40,88 +41,82 @@ import java.util.Set;
  * Created on 2024/11/29
  */
 public class Main {
-    private static final Comparator<List<Integer>> listComparator = new Comparator<List<Integer>>() {
-        @Override
-        public int compare(List<Integer> a, List<Integer> b) {
-            int size = Math.min(a.size(), b.size());
-            for (int i = 0; i < size; i++) {
+    public static void main(String[] args) throws IOException {
+        // 打开文件并映射到内存
+        RandomAccessFile file = new RandomAccessFile("in", "r");
+        FileChannel channel = file.getChannel();
+        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        IntBuffer intBuffer = buffer.asIntBuffer();
+
+        // 读取前四个参数
+        int totalColumns = intBuffer.get(); // 总列数
+        int groupColumns = intBuffer.get(); // 汇总列数
+        int rows = intBuffer.get();         // 行数
+        int topN = intBuffer.get();         // 结果取前多少条记录
+
+        // 读取二维表数据
+        int dataLength = totalColumns * rows;
+        int[] data = new int[dataLength];
+        for (int i = 0; i < dataLength; i++) {
+            data[i] = intBuffer.get();
+        }
+
+        // 组织成二维表
+        List<List<Integer>> table = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            List<Integer> row = new ArrayList<>();
+            for (int j = 0; j < totalColumns; j++) {
+                row.add(data[i * totalColumns + j]);
+            }
+            table.add(row);
+        }
+
+        // 分组去重
+        Map<List<Integer>, Set<List<Integer>>> groupMap = new HashMap<>();
+        for (List<Integer> row : table) {
+            // 获取分组键
+            List<Integer> groupKey = row.subList(0, groupColumns);
+            // 获取需要去重的值
+            List<Integer> remainingValues = row.subList(groupColumns, row.size());
+            // 将去重值添加到对应分组的集合中
+            groupMap.computeIfAbsent(groupKey, k -> new HashSet<>()).add(remainingValues);
+        }
+
+        // 将分组结果转为列表
+        List<Map.Entry<List<Integer>, Set<List<Integer>>>> entries = new ArrayList<>(groupMap.entrySet());
+        // 对分组键排序（字典序）
+        entries.sort(Comparator.comparing(Map.Entry::getKey, (a, b) -> {
+            for (int i = 0; i < Math.min(a.size(), b.size()); i++) {
                 int cmp = a.get(i).compareTo(b.get(i));
-                if (cmp != 0) {
-                    return cmp;
-                }
+                if (cmp != 0) return cmp;
             }
             return Integer.compare(a.size(), b.size());
+        }));
+
+        // 如果需要取前 topN 条记录
+        if (topN != -1 && topN < entries.size()) {
+            entries = entries.subList(0, topN);
         }
-    };
 
-    public static void main(String[] args) {
-        try {
-            RandomAccessFile fs = new RandomAccessFile("in", "r");
-            FileChannel fc = fs.getChannel();
-            MappedByteBuffer buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-            IntBuffer intBuffer = buffer.asIntBuffer();
-
-            // 读取前四个参数
-            int totalColumns = intBuffer.get();
-            int groupColumns = intBuffer.get();
-            int rows = intBuffer.get();
-            int topN = intBuffer.get();
-
-            // 计算数据的总长度
-            int dataLength = totalColumns * rows;
-            int[] data = new int[dataLength];
-            for (int i = 0; i < dataLength; i++) {
-                data[i] = intBuffer.get();
-            }
-
-            // 组织成二维表
-            List<List<Integer>> table = new ArrayList<>();
-            for (int i = 0; i < rows; i++) {
-                List<Integer> row = new ArrayList<>();
-                for (int j = 0; j < totalColumns; j++) {
-                    row.add(data[i * totalColumns + j]);
-                }
-                table.add(row);
-            }
-
-            // 分组
-            Map<List<Integer>, Set<List<Integer>>> groupMap = new HashMap<>();
-            for (List<Integer> row : table) {
-                List<Integer> groupKey = row.subList(0, groupColumns);
-                List<Integer> remainingValues = row.subList(groupColumns, row.size());
-                groupMap.computeIfAbsent(groupKey, k -> new HashSet<>()).add(remainingValues);
-            }
-
-            // 统计去重记录数
-            List<Map.Entry<List<Integer>, Set<List<Integer>>>> entries = new ArrayList<>(groupMap.entrySet());
-            // 按groupKey排序
-            entries.sort(Comparator.comparing(Map.Entry::getKey, listComparator));
-
-            // 取前topN条
-            if (topN != -1 && topN < entries.size()) {
-                entries = entries.subList(0, topN);
-            }
-
-            // 生成结果二维表
-            List<List<Integer>> resultTable = new ArrayList<>();
-            for (Map.Entry<List<Integer>, Set<List<Integer>>> entry : entries) {
-                List<Integer> newRow = new ArrayList<>(entry.getKey());
-                newRow.add(entry.getValue().size());
-                resultTable.add(newRow);
-            }
-
-            // 把所有数字加起来
-            int sum = 0;
-            for (List<Integer> row : resultTable) {
-                for (int num : row) {
-                    sum += num;
-                }
-            }
-
-            System.out.println(sum);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        // 构建结果列表
+        List<List<Integer>> resultTable = new ArrayList<>();
+        for (Map.Entry<List<Integer>, Set<List<Integer>>> entry : entries) {
+            List<Integer> newRow = new ArrayList<>(entry.getKey());
+            newRow.add(entry.getValue().size()); // 添加去重记录数
+            resultTable.add(newRow);
         }
+
+        // 计算结果总和
+        int sum = 0;
+        for (List<Integer> row : resultTable) {
+            for (int num : row) {
+                sum += num;
+            }
+        }
+
+        // 输出结果总和
+        // 按照测试用例 ，这里还需要加上一下无关的列 , 测试用例存在问题，逻辑是ok 的， 比如第二个例子，这个 +4 是什么鬼?????
+        // 到现在没有一个人做出来，逻辑不复杂
+        System.out.println(sum);
     }
 }
