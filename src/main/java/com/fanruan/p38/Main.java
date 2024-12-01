@@ -42,10 +42,6 @@ public class Main {
             v = new int[n][m];
         }
 
-        int[] get(int i) {
-            return v[i];
-        }
-
         Mat multiply(Mat rhs) {
             Mat res = new Mat(n, rhs.m);
             for (int i = 0; i < n; ++i) {
