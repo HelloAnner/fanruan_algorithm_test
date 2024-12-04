@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.StringTokenizer;
+import java.io.PrintWriter;
 
 /**
  * 题目描述：
@@ -30,91 +30,71 @@ import java.util.StringTokenizer;
  * 8
  * <p>
  * 数据范围与提示：
- * 1≤N≤10，1≤M≤10，1≤X≤Y≤N，数字不超过int范围。
+ * 1≤N≤1000000，1≤M≤100000，1≤X≤Y≤N，数字不超过int范围。
  * <p>
- * 直接写会超时，维护一个稀疏表还是超时 ， 直接换线段树
+ * <a href="https://www.luogu.com.cn/problem/P3865">RMQ 问题</a>
+ * <p>
+ * ST表 - 超时
+ * 分块ST表 - ch
  *
  * @author Anner
  * @since 12.0
  * Created on 2024/12/4
  */
+
 public class Main {
-    static int[] tree; // 线段树数组
-    static int[] nums; // 原始数据数组
 
     public static void main(String[] args) throws IOException {
-        // 快速输入输出
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
 
-        // 解析 N 和 M
-        int N = Integer.parseInt(st.nextToken());
-        int M = Integer.parseInt(st.nextToken());
+        // 读取 N 和 M
+        String[] parts = br.readLine().split(" ");
+        int N = Integer.parseInt(parts[0]);
+        int M = Integer.parseInt(parts[1]);
 
-        // 解析数字数组
-        nums = new int[N];
-        st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < N; i++) {
-            nums[i] = Integer.parseInt(st.nextToken());
+        // 读取数组 a
+        parts = br.readLine().split(" ");
+        int[] a = new int[N + 1];
+        for (int i = 1; i <= N; i++) {
+            a[i] = Integer.parseInt(parts[i - 1]);
         }
 
-        // 初始化和构建线段树
-        tree = new int[4 * N];
-        build(0, 0, N - 1);
+        // 预计算 log2 数组
+        int[] log = new int[N + 1];
+        for (int i = 2; i <= N; i++) {
+            log[i] = log[i / 2] + 1;
+        }
 
-        // 处理查询
-        StringBuilder result = new StringBuilder();
+        // 计算最大的 k 值
+        int K = log[N] + 1;
+
+        // 初始化稀疏表 dp
+        int[][] dp = new int[K][N + 1];
+        for (int i = 1; i <= N; i++) {
+            dp[0][i] = a[i];
+        }
+
+        // 填充稀疏表
+        for (int k = 1; k < K; k++) {
+            for (int i = 1; i <= N - (1 << k) + 1; i++) {
+                dp[k][i] = Math.max(dp[k - 1][i], dp[k - 1][i + (1 << (k - 1))]);
+            }
+        }
+
+        // 处理 M 个查询
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < M; i++) {
-            st = new StringTokenizer(br.readLine());
-            int X = Integer.parseInt(st.nextToken()) - 1; // 转换为 0-based 索引
-            int Y = Integer.parseInt(st.nextToken()) - 1; // 转换为 0-based 索引
-            result.append(query(0, 0, N - 1, X, Y)).append("\n");
+            parts = br.readLine().split(" ");
+            int L = Integer.parseInt(parts[0]);
+            int R = Integer.parseInt(parts[1]);
+            int length = R - L + 1;
+            int k = log[length];
+            int maxVal = Math.max(dp[k][L], dp[k][R - (1 << k) + 1]);
+            sb.append(maxVal).append("\n");
         }
 
-        // 一次性写入所有结果
-        bw.write(result.toString());
-        bw.flush();
-        br.close();
-        bw.close();
-    }
-
-    // 构建线段树
-    static void build(int node, int start, int end) {
-        if (start == end) {
-            // 叶子节点包含数组的值
-            tree[node] = nums[start];
-        } else {
-            int mid = (start + end) / 2;
-            int leftChild = 2 * node + 1;
-            int rightChild = 2 * node + 2;
-
-            // 递归构建左右子树
-            build(leftChild, start, mid);
-            build(rightChild, mid + 1, end);
-
-            // 内部节点包含其子节点的最大值
-            tree[node] = Math.max(tree[leftChild], tree[rightChild]);
-        }
-    }
-
-    // 查询区间 [l, r] 内的最大值
-    static int query(int node, int start, int end, int l, int r) {
-        if (r < start || l > end) {
-            // 区间完全不在当前节点的范围内
-            return Integer.MIN_VALUE;
-        }
-        if (l <= start && end <= r) {
-            // 区间完全包含当前节点的范围
-            return tree[node];
-        }
-
-        // 部分重叠：查询左右子节点
-        int mid = (start + end) / 2;
-        int leftChild = 2 * node + 1;
-        int rightChild = 2 * node + 2;
-
-        return Math.max(query(leftChild, start, mid, l, r),
-                query(rightChild, mid + 1, end, l, r));
+        pw.print(sb);
+        pw.flush();
     }
 }
