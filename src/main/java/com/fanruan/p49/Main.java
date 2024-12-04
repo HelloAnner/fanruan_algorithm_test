@@ -1,10 +1,9 @@
 package com.fanruan.p49;
 
+
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 /**
@@ -32,10 +31,12 @@ import java.io.PrintWriter;
  * 数据范围与提示：
  * 1≤N≤1000000，1≤M≤100000，1≤X≤Y≤N，数字不超过int范围。
  * <p>
+ * <a href="https://judge.fineres.com/problem/49">#49. 数列区间最大值</a>
+ * <p>
  * <a href="https://www.luogu.com.cn/problem/P3865">RMQ 问题</a>
  * <p>
  * ST表 - 超时
- * 分块ST表 - ch
+ * 分块ST表 - 超时 ，就差10ms ， tu le
  *
  * @author Anner
  * @since 12.0
@@ -43,58 +44,59 @@ import java.io.PrintWriter;
  */
 
 public class Main {
+    static final int MAX_K = 20;
+    static int[] log2_table;
+
+    static int log2(int x) {
+        return 31 - Integer.numberOfLeadingZeros(x);
+    }
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+        PrintWriter pw = new PrintWriter(System.out);
 
-        // 读取 N 和 M
-        String[] parts = br.readLine().split(" ");
-        int N = Integer.parseInt(parts[0]);
-        int M = Integer.parseInt(parts[1]);
+        String[] input = br.readLine().split(" ");
+        int n = Integer.parseInt(input[0]);
+        int m = Integer.parseInt(input[1]);
 
-        // 读取数组 a
-        parts = br.readLine().split(" ");
-        int[] a = new int[N + 1];
-        for (int i = 1; i <= N; i++) {
-            a[i] = Integer.parseInt(parts[i - 1]);
+        // 预计算对数表
+        log2_table = new int[n + 1];
+        for (int i = 1; i <= n; i++) {
+            log2_table[i] = log2(i);
         }
 
-        // 预计算 log2 数组
-        int[] log = new int[N + 1];
-        for (int i = 2; i <= N; i++) {
-            log[i] = log[i / 2] + 1;
+        // 读取数字序列
+        input = br.readLine().split(" ");
+        int[] a0 = new int[n + 1];
+        for (int i = 1; i <= n; i++) {
+            a0[i] = Integer.parseInt(input[i - 1]);
         }
 
-        // 计算最大的 k 值
-        int K = log[N] + 1;
-
-        // 初始化稀疏表 dp
-        int[][] dp = new int[K][N + 1];
-        for (int i = 1; i <= N; i++) {
-            dp[0][i] = a[i];
+        // 构建ST表
+        int max_k = log2(n);
+        int[][] st = new int[MAX_K][n + 1];
+        for (int i = 1; i <= n; i++) {
+            st[0][i] = a0[i];
         }
-
-        // 填充稀疏表
-        for (int k = 1; k < K; k++) {
-            for (int i = 1; i <= N - (1 << k) + 1; i++) {
-                dp[k][i] = Math.max(dp[k - 1][i], dp[k - 1][i + (1 << (k - 1))]);
+        for (int k = 1; k < MAX_K; k++) {
+            for (int j = 1; j <= n - (1 << k) + 1; j++) {
+                st[k][j] = Math.max(st[k - 1][j], st[k - 1][j + (1 << (k - 1))]);
             }
         }
 
-        // 处理 M 个查询
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < M; i++) {
-            parts = br.readLine().split(" ");
-            int L = Integer.parseInt(parts[0]);
-            int R = Integer.parseInt(parts[1]);
-            int length = R - L + 1;
-            int k = log[length];
-            int maxVal = Math.max(dp[k][L], dp[k][R - (1 << k) + 1]);
-            sb.append(maxVal).append("\n");
+        // 处理查询
+        for (int i = 0; i < m; i++) {
+            input = br.readLine().split(" ");
+            int l = Integer.parseInt(input[0]);
+            int r = Integer.parseInt(input[1]);
+            int length = r - l + 1;
+            int k = log2_table[length];
+            int max = Math.max(st[k][l], st[k][r - (1 << k) + 1]);
+            pw.println(max);
         }
 
-        pw.print(sb);
         pw.flush();
+        pw.close();
+        br.close();
     }
 }
